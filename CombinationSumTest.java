@@ -23,7 +23,7 @@ class CombinationSumTest {
 	public static void getNextCombination(int[] candidates,List<List<Integer>> ans,List<Integer> temp,int target) {
 		if (target==0) {
 			ans.add(new ArrayList<>(temp));//应用传递，不能直接将引用给ans，
-			return;
+//			return;
 		} else {
 			for (int i = 0; i < candidates.length; i++) {
 				temp.add(candidates[i]);
