@@ -4,7 +4,7 @@ import java.util.Arrays;
  * @auther Leon Song
  * @date 2019-06-29 22:30
  */
-public class NO5012_TwoSumLessThanKTest {
+public class NO5021_TwoSumLessThanKTest {
     public static void main(String[] args) {
         //
         int[] arr = {34, 23, 1, 24, 75, 33, 54, 8};//{34,23,1,24,75,33,54,8}
