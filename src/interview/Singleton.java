@@ -7,6 +7,9 @@ public class Singleton {
 
     private volatile static Singleton instance;
 
+    private Singleton(){
+
+    }
 
     public Singleton getInstance(){
 
