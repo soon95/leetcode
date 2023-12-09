@@ -1,4 +1,3 @@
-import sun.reflect.generics.tree.Tree;
 
 /**
  * 114. 二叉树展开为链表
