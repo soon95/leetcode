@@ -38,17 +38,15 @@ public class FileSystem {
      * 创建目录（递归创建中间目录）
      */
     public void mkdir(String path) {
-        if (path.equals("/")) {
-            return; // 根目录已存在，无需创建
+
+        List<String> partList = parsePath(path);
+        if (partList.isEmpty()) {
+            return;
         }
 
-        String[] parts = path.split("/");
         FileNode current = root;
 
-        for (String part : parts) {
-            if (part.isEmpty()) {
-                continue; // 跳过空字符串（如"/a/b"分割后开头的""）
-            }
+        for (String part : partList) {
 
             // 若子节点不存在，创建目录
             current.getChildren().computeIfAbsent(part, name -> new FileNode(true, name, null));
@@ -67,15 +65,21 @@ public class FileSystem {
      */
     public void addContentToFile(String filePath, String content) {
         // 分割路径，获取目录部分和文件名
-        int lastSlashIndex = filePath.lastIndexOf("/");
-        String dirPath = filePath.substring(0, lastSlashIndex);
-        String fileName = filePath.substring(lastSlashIndex + 1);
+        List<String> partList = parsePath(filePath);
+
+        List<String> dirPartList = partList.subList(0, partList.size() - 1);
+        String fileName = partList.getLast();
 
         // 解析目录路径（若不存在则创建）
+        String dirPath = String.join("/", dirPartList);
         FileNode dir = resolvePath(dirPath);
         if (dir == null) {
             mkdir(dirPath); // 递归创建目录
             dir = resolvePath(dirPath);
+        }
+
+        if (dir == null) {
+            throw new IllegalArgumentException("路径不存在");
         }
 
         if (!dir.isDir()) {
@@ -83,13 +87,17 @@ public class FileSystem {
         }
 
         // 获取或创建文件
-        FileNode file = dir.getChildren().computeIfAbsent(fileName, name -> new FileNode(false, name, ""));
-        if (file.isDir()) {
-            throw new RuntimeException("'" + fileName + "'是目录，无法作为文件写入");
+        FileNode file = dir.getChildren().get(fileName);
+        if (file == null) {
+            file = new FileNode(false, fileName, content);
+            dir.getChildren().put(fileName, file);
+        } else {
+            if (file.isDir()) {
+                throw new RuntimeException("'" + fileName + "'是目录，无法作为文件写入");
+            }
+            // 追加内容
+            file.setContent(file.getContent() + content);
         }
-
-        // 追加内容
-        file.setContent(file.getContent() + content);
     }
 
     /**
@@ -110,18 +118,15 @@ public class FileSystem {
      * 辅助方法：解析路径，返回目标节点（若不存在返回null）
      */
     private FileNode resolvePath(String path) {
-        if (path.equals("/")) {
-            return root; // 根路径特殊处理
+
+        List<String> partList = parsePath(path);
+        if (partList.isEmpty()) {
+            return root;
         }
 
-        String[] parts = path.split("/");
         FileNode current = root;
 
-        for (String part : parts) {
-            if (part.isEmpty()) {
-                continue; // 跳过空字符串
-            }
-
+        for (String part : partList) {
             FileNode child = current.getChildren().get(part);
             if (child == null) {
                 return null; // 路径不存在
@@ -132,4 +137,39 @@ public class FileSystem {
 
         return current;
     }
+
+    private List<String> parsePath(String path) {
+
+        String[] split = path.split("/");
+
+        List<String> result = new ArrayList<>();
+
+        for (String item : split) {
+            if (item.isEmpty()) {
+                continue;
+            }
+            result.add(item);
+        }
+
+        return result;
+    }
+
+
+    public static void main(String[] args) {
+
+        FileSystem fileSystem = new FileSystem();
+
+        fileSystem.mkdir("a/b/c");
+
+        List<String> ls = fileSystem.ls("a/b");
+
+        fileSystem.addContentToFile("a/b/c/doc", "hello");
+
+        String s = fileSystem.readContentFromFile("a/b/c/doc");
+
+        System.out.println(s);
+
+
+    }
+
 }

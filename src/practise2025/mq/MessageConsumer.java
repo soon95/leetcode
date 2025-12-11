@@ -2,6 +2,7 @@ package practise2025.mq;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 public class MessageConsumer {
 
@@ -15,13 +16,13 @@ public class MessageConsumer {
         this.broker = broker;
     }
 
-    public void consume(String queueName, MessageConsumeCallBack callBack) {
+    public void consume(String queueName, Function<Message, Boolean> callBack) {
         MessageQueue queue = this.broker.getQueue(queueName);
         executor.submit(() -> {
             while (true) {
                 try {
                     Message message = queue.take();
-                    boolean res = callBack.consume(message);
+                    boolean res = callBack.apply(message);
                     if (!res) {
                         queue.send(message);
                     }
