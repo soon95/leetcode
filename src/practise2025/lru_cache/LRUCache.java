@@ -59,6 +59,8 @@ public class LRUCache {
         } else {
             node.getPreNode().setNextNode(node.getNextNode());
             node.getNextNode().setPreNode(node.getPreNode());
+            node.setNextNode(null);
+            node.setPreNode(null);
         }
 
         this.map.remove(key);

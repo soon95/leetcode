@@ -49,7 +49,7 @@ public class FileSystem {
         for (String part : partList) {
 
             // 若子节点不存在，创建目录
-            current.getChildren().computeIfAbsent(part, name -> new FileNode(true, name, null));
+            current.getChildren().putIfAbsent(part, new FileNode(true, part, null));
 
             FileNode child = current.getChildren().get(part);
             if (!child.isDir()) {
