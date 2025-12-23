@@ -1,7 +1,9 @@
 package practise2025.mq;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MessageBroker {
 
@@ -12,7 +14,9 @@ public class MessageBroker {
     }
 
     public String randomGetQueueName() {
-        return queues.keySet().stream().findAny().get();
+        int i = ThreadLocalRandom.current().nextInt(queues.size());
+        ArrayList<String> strings = new ArrayList<>(queues.keySet());
+        return strings.get(i);
     }
 
 
